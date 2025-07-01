@@ -1,0 +1,166 @@
+--// Hub GUI Completo com botão arrastável, fácil de adicionar scripts, e barra de pesquisa funcional //
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+-- GUI principal
+local GUI = Instance.new("ScreenGui")
+GUI.Name = "NexoraHubUI"
+GUI.ResetOnSpawn = false
+GUI.Parent = game:GetService("CoreGui")
+
+-- Botão de Ativar GUI
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.Text = "NX"
+ToggleBtn.TextColor3 = Color3.fromRGB(170, 0, 255)
+ToggleBtn.TextScaled = true
+ToggleBtn.Font = Enum.Font.GothamBlack
+ToggleBtn.Draggable = true
+ToggleBtn.Active = true
+ToggleBtn.Name = "NexoraToggle"
+ToggleBtn.Parent = GUI
+local UICorner = Instance.new("UICorner", ToggleBtn)
+UICorner.CornerRadius = UDim.new(1, 0)
+
+-- Janela principal
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 600, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Visible = false
+MainFrame.Parent = GUI
+local Corner = Instance.new("UICorner", MainFrame)
+Corner.CornerRadius = UDim.new(0, 12)
+
+-- Lista de scripts
+local ScriptList = Instance.new("ScrollingFrame")
+ScriptList.Size = UDim2.new(0, 200, 1, 0)
+ScriptList.Position = UDim2.new(0, 0, 0, 0)
+ScriptList.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScriptList.ScrollBarThickness = 4
+ScriptList.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ScriptList.BorderSizePixel = 0
+ScriptList.Parent = MainFrame
+local CornerSL = Instance.new("UICorner", ScriptList)
+CornerSL.CornerRadius = UDim.new(0, 0)
+
+-- Barra de Pesquisa
+local SearchBox = Instance.new("TextBox")
+SearchBox.Size = UDim2.new(1, -10, 0, 30)
+SearchBox.Position = UDim2.new(0, 5, 0, 5)
+SearchBox.PlaceholderText = "Pesquisar..."
+SearchBox.TextColor3 = Color3.new(1,1,1)
+SearchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SearchBox.Font = Enum.Font.Gotham
+SearchBox.TextSize = 14
+SearchBox.Parent = ScriptList
+local SearchCorner = Instance.new("UICorner", SearchBox)
+SearchCorner.CornerRadius = UDim.new(0, 6)
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = ScriptList
+
+-- Área de detalhes do script
+local DetailsFrame = Instance.new("Frame")
+DetailsFrame.Size = UDim2.new(1, -200, 1, 0)
+DetailsFrame.Position = UDim2.new(0, 200, 0, 0)
+DetailsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+DetailsFrame.BorderSizePixel = 0
+DetailsFrame.Parent = MainFrame
+local CornerDF = Instance.new("UICorner", DetailsFrame)
+CornerDF.CornerRadius = UDim.new(0, 0)
+
+local Image = Instance.new("ImageLabel")
+Image.Size = UDim2.new(0.9, 0, 0.6, 0)
+Image.Position = UDim2.new(0.05, 0, 0.05, 0)
+Image.BackgroundTransparency = 1
+Image.ScaleType = Enum.ScaleType.Fit
+Image.Parent = DetailsFrame
+
+local ExecuteBtn = Instance.new("TextButton")
+ExecuteBtn.Size = UDim2.new(0.9, 0, 0, 40)
+ExecuteBtn.Position = UDim2.new(0.05, 0, 0.7, 0)
+ExecuteBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+ExecuteBtn.Text = "Executar Script ▶"
+ExecuteBtn.TextColor3 = Color3.new(1, 1, 1)
+ExecuteBtn.Font = Enum.Font.GothamBold
+ExecuteBtn.TextSize = 16
+ExecuteBtn.Parent = DetailsFrame
+local ExecCorner = Instance.new("UICorner", ExecuteBtn)
+ExecCorner.CornerRadius = UDim.new(0, 6)
+
+local LinkBtn = Instance.new("TextButton")
+LinkBtn.Size = UDim2.new(0.43, 0, 0, 30)
+LinkBtn.Position = UDim2.new(0.05, 0, 0.85, 0)
+LinkBtn.Text = "📎 Jogo"
+LinkBtn.TextColor3 = Color3.new(1, 1, 1)
+LinkBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+LinkBtn.Font = Enum.Font.Gotham
+LinkBtn.TextSize = 14
+LinkBtn.Parent = DetailsFrame
+local LinkCorner = Instance.new("UICorner", LinkBtn)
+LinkCorner.CornerRadius = UDim.new(0, 6)
+
+local DiscordBtn = Instance.new("TextButton")
+DiscordBtn.Size = UDim2.new(0.43, 0, 0, 30)
+DiscordBtn.Position = UDim2.new(0.52, 0, 0.85, 0)
+DiscordBtn.Text = "💬 Discord"
+DiscordBtn.TextColor3 = Color3.new(1, 1, 1)
+DiscordBtn.BackgroundColor3 = Color3.fromRGB(30, 60, 120)
+DiscordBtn.Font = Enum.Font.Gotham
+DiscordBtn.TextSize = 14
+DiscordBtn.Parent = DetailsFrame
+local DiscCorner = Instance.new("UICorner", DiscordBtn)
+DiscCorner.CornerRadius = UDim.new(0, 6)
+
+-- Script para controle
+local Scripts = {}
+
+function addScript(name, imageUrl, code, gameLink, discordLink)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, -10, 0, 30)
+	btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	btn.Text = name
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 14
+	btn.LayoutOrder = #Scripts + 2
+	btn.Parent = ScriptList
+	local bCorner = Instance.new("UICorner", btn)
+	bCorner.CornerRadius = UDim.new(0, 6)
+
+	table.insert(Scripts, {Button = btn, Name = name})
+
+	btn.MouseButton1Click:Connect(function()
+		Image.Image = imageUrl
+		ExecuteBtn.MouseButton1Click:Connect(function()
+			loadstring(code)()
+		end)
+		LinkBtn.MouseButton1Click:Connect(function()
+			setclipboard(gameLink)
+		end)
+		DiscordBtn.MouseButton1Click:Connect(function()
+			setclipboard(discordLink)
+		end)
+	end)
+end
+
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+	local search = SearchBox.Text:lower()
+	for _, s in pairs(Scripts) do
+		s.Button.Visible = s.Name:lower():find(search) ~= nil
+	end
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Exemplo de adição de script:
+addScript("🏀Basketball Legends🏀", "https://i.ibb.co/s9Lr4NBz/noFilter.webp", "loadstring(game:HttpGet("https://raw.githubusercontent.com/vnausea/absence-mini/refs/heads/main/absencemini.lua"))()", "https://www.roblox.com/pt/games/14259168147/Basketball-Legends", "https://discord.gg/FkqPKkDZW4")
