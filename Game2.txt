@@ -14354,15 +14354,15 @@ end
    end,
 })
 
-local Button = Main2Tab:CreateButton({
-   Name = "[2X]🏀Basketball Legends🏀",
+local Button = MainTab:CreateButton({
+   Name = "OP Reach Script",
    Callback = function()
    local RunService = game:GetService("RunService")
 
 -- Função para carregar o script remoto
 local function carregarScriptRemoto()
     local sucesso, resultado = pcall(function()
-        return loadstring(game:HttpGet("https://raw.githubusercontent.com/vnausea/absence-mini/refs/heads/main/absencemini.lua"))()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/MaxicsSoft/XyrezAutoRank/main/StealTimeFromOthers.lua"))()
     end)
 
     if not sucesso then
