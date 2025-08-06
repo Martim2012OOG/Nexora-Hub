@@ -14445,3 +14445,26 @@ if RunService:IsClient() then
 end
    end,
 })
+
+local Button = Main2Tab:CreateButton({
+   Name = "Build a Plane",
+   Callback = function()
+   local RunService = game:GetService("RunService")
+
+-- Função para carregar o script remoto
+local function carregarScriptRemoto()
+    local sucesso, resultado = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/NameHubScript/_/refs/heads/main/b.lua",true))()
+    end)
+
+    if not sucesso then
+        warn("Erro ao carregar o script: " .. resultado)
+    end
+end
+
+-- Exemplo: Executar quando o jogo começa (em LocalScript)
+if RunService:IsClient() then
+    carregarScriptRemoto()
+end
+   end,
+})
