@@ -14468,3 +14468,27 @@ if RunService:IsClient() then
 end
    end,
 })
+
+local Button = Main2Tab:CreateButton({
+   Name = "Auto Piano🎹",
+   Callback = function()
+local RunService = game:GetService("RunService")
+
+-- Função para carregar o script remoto
+local function carregarScriptRemoto()
+    local sucesso, resultado = pcall(function()
+        return loadstring(game:HttpGet(
+            "https://raw.githubusercontent.com/hellohellohell012321/TALENTLESS/main/TALENTLESS",
+            true
+        ))()
+    end)
+
+    if not sucesso then
+        warn("Erro ao carregar o script: " .. tostring(resultado))
+    end
+end
+
+-- Executa somente no cliente
+if RunService:IsClient() then
+    carregarScriptRemoto()
+end
