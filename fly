@@ -70,7 +70,7 @@ TextLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TextLabel.Position = UDim2.new(0.469327301, 0, 0, 0)
 TextLabel.Size = UDim2.new(0, 100, 0, 28)
 TextLabel.Font = Enum.Font.SourceSans
-TextLabel.Text = "Nexora Fly"
+TextLabel.Text = "GUI v1.0.6 EN"
 TextLabel.TextColor3 = Color3.new(0, 255, 0) 
 TextLabel.TextScaled = true
 TextLabel.TextSize = 13.250
@@ -151,7 +151,7 @@ nowe = false
 
 game:GetService("StarterGui"):SetCore("SendNotification", { 
 	Title = "FLY GUI";
-	Text = "by Nexora";
+	Text = "by Liver zMods";
 	Icon = "rbxthumb://type=Asset&id=11935868660&w=150&h=150"})
 Duration = 15;
 
@@ -162,8 +162,8 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
 Duration = 10;
 
 game:GetService("StarterGui"):SetCore("SendNotification", { 
-	Title = "By Nexora Mods";
-	Text = "created by Nexora!";
+	Title = "By Liver zMods";
+	Text = "created by Brasileiro!";
 	Icon = "rbxthumb://type=Asset&id=11935866652&w=150&h=150"})
 Duration = 30;
 
@@ -484,3 +484,17 @@ mini.MouseButton1Click:Connect(function()
 	mini2.Visible = true
 	main.Frame.BackgroundTransparency = 1
 	closebutton.Position =  UDim2.new(0, 0, -1, 57)
+end)
+
+mini2.MouseButton1Click:Connect(function()
+	up.Visible = true
+	down.Visible = true
+	onof.Visible = true
+	plus.Visible = true
+	speed.Visible = true
+	mine.Visible = true
+	mini.Visible = true
+	mini2.Visible = false
+	main.Frame.BackgroundTransparency = 0 
+	closebutton.Position =  UDim2.new(0, 0, -1, 27)
+end)
