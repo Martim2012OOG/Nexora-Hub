@@ -39,3 +39,10 @@ local Window = Rayfield:CreateWindow({
 
 local MainTab = Window:CreateTab("Universal Scripts", 4483362458) -- Title, Image
 local MainSection = MainTab:CreateSection("Scripts")
+
+local Button = MainTab:CreateButton({
+   Name = "Button Example",
+   Callback = function()
+   -- The function that takes place when the button is pressed
+   end,
+})
