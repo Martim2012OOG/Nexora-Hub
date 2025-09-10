@@ -2,13 +2,13 @@ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Sev
 
 local Window = OrionLib:MakeWindow({Name = "Nexora Hub", HidePremium = false, SaveConfig = true, ConfigFolder = "Nexora Hub"})
 local Tab = Window:MakeTab({
-	Name = "Tab 1",
+	Name = "Universal",
 	Icon = "rbxassetid://4483345998",
 	PremiumOnly = false
 })
 OrionLib:MakeNotification({
-	Name = "Title!",
-	Content = "Notification content... what will it say??",
+	Name = "Loading...",
+	Content = "Nexora Loading...",
 	Image = "rbxassetid://4483345998",
 	Time = 5
 })
