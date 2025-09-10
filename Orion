@@ -82,6 +82,14 @@ UniversalTab:AddButton({
     end
 })
 
+-- Botão Roblox EGOR
+UniversalTab:AddButton({
+    Name = "Roblox EGOR",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/GBmWn4eZ", true))()
+    end
+})
+
 -- ==========================
 -- ABA IN GAME
 -- ==========================
