@@ -1,0 +1,75 @@
+-- Criar ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeviceSelectorGui"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- Criar Frame principal
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 300, 0, 150)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 10)
+Corner.Parent = Frame
+
+-- Título
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Device"
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 24
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Parent = Frame
+
+-- Botão Mobile
+local MobileButton = Instance.new("TextButton")
+MobileButton.Size = UDim2.new(0.4, 0, 0.4, 0)
+MobileButton.Position = UDim2.new(0.05, 0, 0.5, 0)
+MobileButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+MobileButton.Text = "Mobile"
+MobileButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MobileButton.Font = Enum.Font.SourceSansBold
+MobileButton.TextSize = 20
+MobileButton.Parent = Frame
+
+local CornerMobile = Instance.new("UICorner")
+CornerMobile.CornerRadius = UDim.new(0, 8)
+CornerMobile.Parent = MobileButton
+
+-- Botão PC
+local PCButton = Instance.new("TextButton")
+PCButton.Size = UDim2.new(0.4, 0, 0.4, 0)
+PCButton.Position = UDim2.new(0.55, 0, 0.5, 0)
+PCButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+PCButton.Text = "PC"
+PCButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+PCButton.Font = Enum.Font.SourceSansBold
+PCButton.TextSize = 20
+PCButton.Parent = Frame
+
+local CornerPC = Instance.new("UICorner")
+CornerPC.CornerRadius = UDim.new(0, 8)
+CornerPC.Parent = PCButton
+
+-- Função para executar script e destruir GUI depois
+local function ExecuteScript(url)
+    spawn(function()
+        loadstring(game:HttpGet(url, true))()
+        ScreenGui:Destroy()
+    end)
+end
+
+-- Conexão dos botões
+MobileButton.MouseButton1Click:Connect(function()
+    ExecuteScript("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Orion")
+end)
+
+PCButton.MouseButton1Click:Connect(function()
+    ExecuteScript("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Game2.txt")
+end)
