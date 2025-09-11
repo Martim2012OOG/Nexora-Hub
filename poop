@@ -390,5 +390,4 @@ unequipButton.MouseButton1Click:Connect(unequipAllTools)
 poopButton.MouseButton1Click:Connect(togglePoopLoop)
 oneClickSellButton.MouseButton1Click:Connect(sellInventoryOnce)
 autoSellButton.MouseButton1Click:Connect(toggleSellLoop)
-   end,
-})
+   end)
