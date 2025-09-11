@@ -41,7 +41,7 @@ local MainTab = Window:CreateTab("Universal Scripts", 4483362458) -- Title, Imag
 local MainSection = MainTab:CreateSection("Scripts")
 
 local Button = MainTab:CreateButton({
-   Name = "Button Example",
+   Name = "Fly V3",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/fly"))()
        -- The function that takes place when the button is pressed
