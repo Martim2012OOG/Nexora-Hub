@@ -46,4 +46,5 @@ local Button = MainTab:CreateButton({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/fly"))()
        -- The function that takes place when the button is pressed
    end,
+})
    
