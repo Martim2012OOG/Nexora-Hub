@@ -1,7 +1,7 @@
 -- Carregar Rayfield
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- Criar janela principal estilo Orion
+-- Criar janela principal
 local Window = Rayfield:CreateWindow({
     Name = "Nexora Hub",
     LoadingTitle = "Nexora Hub",
@@ -11,32 +11,28 @@ local Window = Rayfield:CreateWindow({
         FolderName = "NexoraHub",
         FileName = "Config"
     },
-    Theme = "Dark", -- Dark mais clean
+    Theme = "Dark",
     KeySystem = false
 })
-
--- Ajustes de estilo para parecer Orion
-Window.Size = UDim2.new(0, 500, 0, 350)
-Window.Position = UDim2.new(0.25, 0, 0.2, 0)
-Window.BackgroundTransparency = 0.15
-Window.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 
 -- ==========================
 -- UNIVERSAL
 -- ==========================
 local UniversalTab = Window:CreateTab("UNIVERSAL", "rewind")
 
-local FlyButton = UniversalTab:CreateButton({
+-- Fly Script
+UniversalTab:CreateButton({
     Name = "Fly Script",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/fly"))()
-    end,
+    end
 })
 
+-- Max Jumps
 local maxJumps = 2
-local JumpSlider = UniversalTab:CreateSlider({
+UniversalTab:CreateSlider({
     Name = "Max Jumps",
-    Range = {1, 1000},
+    Range = {1,1000},
     Increment = 1,
     Suffix = "jumps",
     CurrentValue = maxJumps,
@@ -44,65 +40,94 @@ local JumpSlider = UniversalTab:CreateSlider({
     Callback = function(Value)
         maxJumps = Value
         print("Max Jumps set to:", maxJumps)
-    end,
+    end
 })
 
-local AimBotButton = UniversalTab:CreateButton({
+-- AimBot
+UniversalTab:CreateButton({
     Name = "AimBot (PC)",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/aim"))()
-    end,
+    end
 })
 
-local TeleportButton = UniversalTab:CreateButton({
+-- Teleport
+UniversalTab:CreateButton({
     Name = "Teleport",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Roblo/refs/heads/main/Tp.lua"))()
-    end,
+    end
 })
 
-local InfiniteYieldButton = UniversalTab:CreateButton({
+-- Infinite Yield
+UniversalTab:CreateButton({
     Name = "Infinite Yield",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-    end,
+    end
 })
 
-local DexButton = UniversalTab:CreateButton({
+-- Dex Explorer
+UniversalTab:CreateButton({
     Name = "Dex Explorer",
     Callback = function()
         loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Dex%20Explorer.lua"))()
-    end,
+    end
 })
 
-local ReachButton = UniversalTab:CreateButton({
+-- Reach
+UniversalTab:CreateButton({
     Name = "Reach",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Reach"))()
-    end,
+    end
 })
 
-local EGORButton = UniversalTab:CreateButton({
+-- Roblox EGOR
+UniversalTab:CreateButton({
     Name = "Roblox EGOR",
     Callback = function()
         loadstring(game:HttpGet("https://pastebin.com/raw/GBmWn4eZ", true))()
-    end,
+    end
 })
 
 -- ==========================
--- IN GAME
+-- IN GAME (Game Scripts)
 -- ==========================
 local InGameTab = Window:CreateTab("IN GAME", "settings")
 
-local HelloButton = InGameTab:CreateButton({
-    Name = "Print Hello",
-    Callback = function()
-        print("Função IN GAME executada")
-    end,
-})
+local function CreateGameButton(Tab, Name, URL)
+    Tab:CreateButton({
+        Name = Name,
+        Callback = function()
+            local RunService = game:GetService("RunService")
+            local function carregarScriptRemoto()
+                local sucesso, resultado = pcall(function()
+                    return loadstring(game:HttpGet(URL, true))()
+                end)
+                if not sucesso then
+                    warn("Erro ao carregar o script: "..resultado)
+                end
+            end
+            if RunService:IsClient() then
+                carregarScriptRemoto()
+            end
+        end
+    })
+end
+
+-- Game Scripts
+CreateGameButton(InGameTab, "[2X]🏀Basketball Legends🏀", "https://raw.githubusercontent.com/vnausea/absence-mini/refs/heads/main/absencemini.lua")
+CreateGameButton(InGameTab, "Grow a Garden Spawner(Visual)", "https://raw.githubusercontent.com/iwantsom3/script/refs/heads/main/Gag")
+CreateGameButton(InGameTab, "OP Reach Script", "https://raw.githubusercontent.com/MaxicsSoft/XyrezAutoRank/main/StealTimeFromOthers.lua")
+CreateGameButton(InGameTab, "Steal a Brainrot", "https://raw.githubusercontent.com/Jake-Brock/Scripts/main/Fw%20SAB.lua")
+CreateGameButton(InGameTab, "Backpacking ⛺🐻", "https://raw.githubusercontent.com/Martim2012OOG/Roblox/refs/heads/main/Game")
+CreateGameButton(InGameTab, "Prospecting💎", "https://raw.githubusercontent.com/x2zu/loader/main/games/Prospecting.lua")
+CreateGameButton(InGameTab, "Build a Plane", "https://raw.githubusercontent.com/NameHubScript/_/refs/heads/main/b.lua")
+CreateGameButton(InGameTab, "Universal Piano🎹", "https://raw.githubusercontent.com/hellohellohell012321/TALENTLESS/main/TALENTLESS")
 
 -- ==========================
--- Double Jump Script
+-- DOUBLE JUMP SCRIPT
 -- ==========================
 local UIS = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
@@ -127,6 +152,6 @@ UIS.JumpRequest:Connect(function()
 end)
 
 -- ==========================
--- Carregar Config
+-- CARREGAR CONFIG
 -- ==========================
 Rayfield:LoadConfiguration()
