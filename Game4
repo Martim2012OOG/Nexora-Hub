@@ -1,50 +1,132 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- Carregar Rayfield
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
+-- Criar janela principal estilo Orion
 local Window = Rayfield:CreateWindow({
-   Name = "Nexora Hub",
-   Icon = 80750160040867, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "Nexora Loading...",
-   LoadingSubtitle = "Wait a while...",
-   ShowText = "Nexora Hub", -- for mobile users to unhide rayfield, change if you'd like
-   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
-
-   ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
-
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
-
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "Big Hub"
-   },
-
-   Discord = {
-      Enabled = true, -- Prompt the user to join your Discord server if their executor supports it
-      Invite = "https://discord.gg/s5kvY4Pvjr", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
-   },
-
-   KeySystem = true, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "Free Key System",
-      Subtitle = "Buy The Premium Key To Got Best Scripts",
-      Note = "Join Discord To Get Key", -- Use this to tell the user how to get a key
-      FileName = "Nexora HUB Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
-      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"NexoraTestFreeKey"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
-   }
+    Name = "Nexora Hub",
+    LoadingTitle = "Nexora Hub",
+    LoadingSubtitle = "by You",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "NexoraHub",
+        FileName = "Config"
+    },
+    Theme = "Dark", -- Dark mais clean
+    KeySystem = false
 })
 
-local MainTab = Window:CreateTab("Universal Scripts", 4483362458) -- Title, Image
-local MainSection = MainTab:CreateSection("Scripts")
+-- Ajustes de estilo para parecer Orion
+Window.Size = UDim2.new(0, 500, 0, 350)
+Window.Position = UDim2.new(0.25, 0, 0.2, 0)
+Window.BackgroundTransparency = 0.15
+Window.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 
-local Button = MainTab:CreateButton({
-   Name = "Fly V3",
+-- ==========================
+-- UNIVERSAL
+-- ==========================
+local UniversalTab = Window:CreateTab("UNIVERSAL", "rewind")
+
+local FlyButton = UniversalTab:CreateButton({
+    Name = "Fly Script",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/fly"))()
-       -- The function that takes place when the button is pressed
-   end,
+    end,
 })
-   
+
+local maxJumps = 2
+local JumpSlider = UniversalTab:CreateSlider({
+    Name = "Max Jumps",
+    Range = {1, 1000},
+    Increment = 1,
+    Suffix = "jumps",
+    CurrentValue = maxJumps,
+    Flag = "MaxJumps",
+    Callback = function(Value)
+        maxJumps = Value
+        print("Max Jumps set to:", maxJumps)
+    end,
+})
+
+local AimBotButton = UniversalTab:CreateButton({
+    Name = "AimBot (PC)",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/aim"))()
+    end,
+})
+
+local TeleportButton = UniversalTab:CreateButton({
+    Name = "Teleport",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Roblo/refs/heads/main/Tp.lua"))()
+    end,
+})
+
+local InfiniteYieldButton = UniversalTab:CreateButton({
+    Name = "Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end,
+})
+
+local DexButton = UniversalTab:CreateButton({
+    Name = "Dex Explorer",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Dex%20Explorer.lua"))()
+    end,
+})
+
+local ReachButton = UniversalTab:CreateButton({
+    Name = "Reach",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Reach"))()
+    end,
+})
+
+local EGORButton = UniversalTab:CreateButton({
+    Name = "Roblox EGOR",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/GBmWn4eZ", true))()
+    end,
+})
+
+-- ==========================
+-- IN GAME
+-- ==========================
+local InGameTab = Window:CreateTab("IN GAME", "settings")
+
+local HelloButton = InGameTab:CreateButton({
+    Name = "Print Hello",
+    Callback = function()
+        print("Função IN GAME executada")
+    end,
+})
+
+-- ==========================
+-- Double Jump Script
+-- ==========================
+local UIS = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local jumps = 0
+local jumpTick = tick()
+
+humanoid.StateChanged:Connect(function(_, new)
+    if new == Enum.HumanoidStateType.Landed then
+        jumps = 0
+    end
+end)
+
+UIS.JumpRequest:Connect(function()
+    if jumps < maxJumps and tick() - jumpTick > 0.2 then
+        jumpTick = tick()
+        jumps += 1
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+-- ==========================
+-- Carregar Config
+-- ==========================
+Rayfield:LoadConfiguration()
