@@ -71,5 +71,5 @@ MobileButton.MouseButton1Click:Connect(function()
 end)
 
 PCButton.MouseButton1Click:Connect(function()
-    ExecuteScript("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Game2.txt")
+    ExecuteScript("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Game4")
 end)
