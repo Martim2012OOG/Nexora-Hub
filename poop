@@ -1,0 +1,394 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local backpack = player:WaitForChild("Backpack")
+
+local poopEvent = ReplicatedStorage:WaitForChild("PoopEvent")
+local poopChargeStartEvent = ReplicatedStorage:WaitForChild("PoopChargeStart")
+local poopResponseChosenEvent = ReplicatedStorage:WaitForChild("PoopResponseChosen")
+
+local isPoopLooping = false
+local isSellLooping = false
+local Whitelist = {}
+local antiFriendsEnabled = false
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ControlGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 200, 0, 290)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -145)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.BorderColor3 = Color3.fromRGB(80, 80, 80)
+mainFrame.BorderSizePixel = 2
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+mainFrame.Visible = true
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 8)
+uiCorner.Parent = mainFrame
+
+local heaviestButton = Instance.new("TextButton")
+heaviestButton.Name = "HeaviestButton"
+heaviestButton.Size = UDim2.new(1, -20, 0, 30)
+heaviestButton.Position = UDim2.new(0.5, -90, 0, 10)
+heaviestButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+heaviestButton.Text = "Equip Heaviest"
+heaviestButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+heaviestButton.Font = Enum.Font.SourceSansBold
+heaviestButton.TextSize = 16
+heaviestButton.Parent = mainFrame
+local heaviestCorner = uiCorner:Clone()
+heaviestCorner.Parent = heaviestButton
+
+local unequipButton = Instance.new("TextButton")
+unequipButton.Name = "UnequipButton"
+unequipButton.Size = UDim2.new(1, -20, 0, 30)
+unequipButton.Position = UDim2.new(0.5, -90, 0, 50)
+unequipButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+unequipButton.Text = "Unequip All"
+unequipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+unequipButton.Font = Enum.Font.SourceSansBold
+unequipButton.TextSize = 16
+unequipButton.Parent = mainFrame
+local unequipCorner = uiCorner:Clone()
+unequipCorner.Parent = unequipButton
+
+local poopButton = Instance.new("TextButton")
+poopButton.Name = "PoopButton"
+poopButton.Size = UDim2.new(1, -20, 0, 30)
+poopButton.Position = UDim2.new(0.5, -90, 0, 90)
+poopButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+poopButton.Text = "Auto-Poop [OFF]"
+poopButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+poopButton.Font = Enum.Font.SourceSansBold
+poopButton.TextSize = 16
+poopButton.Parent = mainFrame
+local poopCorner = uiCorner:Clone()
+poopCorner.Parent = poopButton
+
+local poopDelayTextBox = Instance.new("TextBox")
+poopDelayTextBox.Name = "PoopDelayTextBox"
+poopDelayTextBox.Size = UDim2.new(1, -20, 0, 30)
+poopDelayTextBox.Position = UDim2.new(0.5, -90, 0, 130)
+poopDelayTextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+poopDelayTextBox.Text = "0.2"
+poopDelayTextBox.PlaceholderText = "Poop Delay"
+poopDelayTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+poopDelayTextBox.Font = Enum.Font.SourceSans
+poopDelayTextBox.TextSize = 14
+poopDelayTextBox.ClearTextOnFocus = false
+poopDelayTextBox.Parent = mainFrame
+local poopDelayCorner = uiCorner:Clone()
+poopDelayCorner.Parent = poopDelayTextBox
+
+local oneClickSellButton = Instance.new("TextButton")
+oneClickSellButton.Name = "OneClickSellButton"
+oneClickSellButton.Size = UDim2.new(1, -20, 0, 30)
+oneClickSellButton.Position = UDim2.new(0.5, -90, 0, 170)
+oneClickSellButton.BackgroundColor3 = Color3.fromRGB(50, 120, 200)
+oneClickSellButton.Text = "Sell Inventory Once"
+oneClickSellButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+oneClickSellButton.Font = Enum.Font.SourceSansBold
+oneClickSellButton.TextSize = 16
+oneClickSellButton.Parent = mainFrame
+local oneClickSellCorner = uiCorner:Clone()
+oneClickSellCorner.Parent = oneClickSellButton
+
+local autoSellButton = Instance.new("TextButton")
+autoSellButton.Name = "AutoSellButton"
+autoSellButton.Size = UDim2.new(1, -20, 0, 30)
+autoSellButton.Position = UDim2.new(0.5, -90, 0, 210)
+autoSellButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+autoSellButton.Text = "Auto-Sell [OFF]"
+autoSellButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoSellButton.Font = Enum.Font.SourceSansBold
+autoSellButton.TextSize = 16
+autoSellButton.Parent = mainFrame
+local autoSellCorner = uiCorner:Clone()
+autoSellCorner.Parent = autoSellButton
+
+local sellDelayTextBox = Instance.new("TextBox")
+sellDelayTextBox.Name = "SellDelayTextBox"
+sellDelayTextBox.Size = UDim2.new(1, -20, 0, 30)
+sellDelayTextBox.Position = UDim2.new(0.5, -90, 0, 250)
+sellDelayTextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+sellDelayTextBox.Text = "10"
+sellDelayTextBox.PlaceholderText = "Sell Delay"
+sellDelayTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+sellDelayTextBox.Font = Enum.Font.SourceSans
+sellDelayTextBox.TextSize = 14
+sellDelayTextBox.ClearTextOnFocus = false
+sellDelayTextBox.Parent = mainFrame
+local sellDelayCorner = uiCorner:Clone()
+sellDelayCorner.Parent = sellDelayTextBox
+
+local flingFrame = Instance.new("Frame")
+flingFrame.Name = "FlingFrame"
+flingFrame.Size = UDim2.new(0, 160, 0, 80)
+flingFrame.Position = UDim2.new(0, 10, 0.5, -40)
+flingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+flingFrame.BorderColor3 = Color3.fromRGB(80, 80, 80)
+flingFrame.BorderSizePixel = 2
+flingFrame.Active = true
+flingFrame.Draggable = true
+flingFrame.Parent = screenGui
+flingFrame.Visible = true
+local flingCorner = uiCorner:Clone()
+flingCorner.Parent = flingFrame
+
+local flingTargetBox = Instance.new("TextBox")
+flingTargetBox.Name = "FlingTargetBox"
+flingTargetBox.Size = UDim2.new(1, -10, 0, 30)
+flingTargetBox.Position = UDim2.new(0.5, -75, 0, 5)
+flingTargetBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+flingTargetBox.PlaceholderText = "Target Name"
+flingTargetBox.Text = ""
+flingTargetBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+flingTargetBox.Font = Enum.Font.SourceSans
+flingTargetBox.TextSize = 14
+flingTargetBox.ClearTextOnFocus = false
+flingTargetBox.Parent = flingFrame
+local flingBoxCorner = uiCorner:Clone()
+flingBoxCorner.Parent = flingTargetBox
+
+local flingTargetButton = Instance.new("TextButton")
+flingTargetButton.Name = "FlingTargetButton"
+flingTargetButton.Size = UDim2.new(1, -10, 0, 30)
+flingTargetButton.Position = UDim2.new(0.5, -75, 0, 45)
+flingTargetButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+flingTargetButton.Text = "Fling Target"
+flingTargetButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+flingTargetButton.Font = Enum.Font.SourceSansBold
+flingTargetButton.TextSize = 16
+flingTargetButton.Parent = flingFrame
+local flingButtonCorner = uiCorner:Clone()
+flingButtonCorner.Parent = flingTargetButton
+
+local hideShowButton = Instance.new("TextButton")
+hideShowButton.Name = "HideShowButton"
+hideShowButton.Size = UDim2.new(0, 80, 0, 25)
+hideShowButton.Position = UDim2.new(0.5, -40, 0, 10)
+hideShowButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+hideShowButton.BorderColor3 = Color3.fromRGB(80, 80, 80)
+hideShowButton.BorderSizePixel = 1
+hideShowButton.Text = "Hide UI"
+hideShowButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+hideShowButton.Font = Enum.Font.SourceSansBold
+hideShowButton.TextSize = 14
+hideShowButton.Active = true
+hideShowButton.Draggable = true
+hideShowButton.Parent = screenGui
+local hideShowCorner = uiCorner:Clone()
+hideShowCorner.Parent = hideShowButton
+
+local function Message(_Title, _Text, Time)
+	StarterGui:SetCore("SendNotification", {Title = _Title, Text = _Text, Duration = Time})
+end
+
+local function equipHeaviestTool()
+	local heaviestTool = nil
+	local maxLbs = -1
+	for _, tool in ipairs(backpack:GetChildren()) do
+		if tool:IsA("Tool") then
+			local lbsString = tool.Name:match("%((%d+%.?%d*) lbs%)")
+			if lbsString then
+				local lbs = tonumber(lbsString)
+				if lbs and lbs > maxLbs then
+					maxLbs = lbs
+					heaviestTool = tool
+				end
+			end
+		end
+	end
+	if heaviestTool then
+		humanoid:EquipTool(heaviestTool)
+	end
+end
+
+local function unequipAllTools()
+	humanoid:UnequipTools()
+end
+
+local function togglePoopLoop()
+	isPoopLooping = not isPoopLooping
+	if isPoopLooping then
+		poopButton.Text = "Auto-Poop [ON]"
+		poopButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+		task.spawn(function()
+			while isPoopLooping do
+				local delay = tonumber(poopDelayTextBox.Text) or 0.1
+				poopChargeStartEvent:FireServer()
+				local args = {[1] = 1}
+				poopEvent:FireServer(unpack(args))
+				task.wait(delay)
+			end
+		end)
+	else
+		poopButton.Text = "Auto-Poop [OFF]"
+		poopButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	end
+end
+
+local function sellInventoryOnce()
+	local args = {
+		[1] = "2. [I want to sell my inventory.]"
+	}
+	poopResponseChosenEvent:FireServer(unpack(args))
+end
+
+local function toggleSellLoop()
+	isSellLooping = not isSellLooping
+	if isSellLooping then
+		autoSellButton.Text = "Auto-Sell [ON]"
+		autoSellButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+		task.spawn(function()
+			while isSellLooping do
+				local delay = tonumber(sellDelayTextBox.Text) or 1
+				local args = {
+					[1] = "2. [I want to sell my inventory.]"
+				}
+				poopResponseChosenEvent:FireServer(unpack(args))
+				task.wait(delay)
+			end
+		end)
+	else
+		autoSellButton.Text = "Auto-Sell [OFF]"
+		autoSellButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	end
+end
+
+local function GetPlayer(Name)
+	for _, x in next, Players:GetPlayers() do
+		if x ~= player and (x.Name:lower():match("^" .. Name:lower()) or x.DisplayName:lower():match("^" .. Name:lower())) then
+			return x
+		end
+	end
+	return nil
+end
+
+local function SkidFling(TargetPlayer)
+	if not TargetPlayer then return end
+	if Whitelist[TargetPlayer.Name:lower()] then return Message("Info", TargetPlayer.Name .. " is whitelisted.", 3) end
+	if antiFriendsEnabled and player:IsFriendsWith(TargetPlayer.UserId) then return Message("Skipped", TargetPlayer.Name .. " is a friend.", 3) end
+
+	local Character = player.Character
+	local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+	local RootPart = Humanoid and Humanoid.RootPart
+	local TCharacter = TargetPlayer.Character
+	if not TCharacter then return end
+	local THumanoid = TCharacter:FindFirstChildOfClass("Humanoid")
+	local TRootPart = THumanoid and THumanoid.RootPart
+	local THead = TCharacter:FindFirstChild("Head")
+	local Accessory = TCharacter:FindFirstChildOfClass("Accessory")
+	local Handle = Accessory and Accessory:FindFirstChild("Handle")
+
+	if not (Character and Humanoid and RootPart) then return Message("Error", "Your character is missing parts.", 4) end
+
+	if RootPart.Velocity.Magnitude < 50 then getgenv().OldPos = RootPart.CFrame end
+	if THumanoid and THumanoid.Sit then return Message("Error", "Target is sitting.", 4) end
+	if THead then workspace.CurrentCamera.CameraSubject = THead
+	elseif Handle then workspace.CurrentCamera.CameraSubject = Handle
+	elseif THumanoid then workspace.CurrentCamera.CameraSubject = THumanoid end
+	if not TCharacter:FindFirstChildWhichIsA("BasePart") then return end
+
+	local FPos = function(BasePart, Pos, Ang)
+		RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+		Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+		local velocity = 9e7
+		RootPart.Velocity = Vector3.new(velocity, velocity * 10, velocity)
+		RootPart.RotVelocity = Vector3.new(velocity, velocity, velocity)
+	end
+
+	local SFBasePart = function(BasePart)
+		local flingTimeout = 2
+		local Time = tick()
+		local Angle = 0
+		repeat
+			if not (RootPart and THumanoid and BasePart and BasePart.Parent) then break end
+			if BasePart.Velocity.Magnitude < 50 then
+				Angle = Angle + 100
+				FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+				task.wait()
+				FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+				task.wait()
+			else
+				FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+				task.wait()
+				FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+				task.wait()
+			end
+		until BasePart.Velocity.Magnitude > 500 or not BasePart.Parent or BasePart.Parent ~= TargetPlayer.Character or not TargetPlayer.Parent or THumanoid.Sit or Humanoid.Health <= 0 or tick() > Time + flingTimeout
+	end
+
+	workspace.FallenPartsDestroyHeight = 0 / 0
+	local BV = Instance.new("BodyVelocity", RootPart)
+	BV.Name = "EpixVel"
+	BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+	BV.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+	local partToFling = TRootPart or THead or Handle
+	if partToFling then
+		if TRootPart and THead and (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then SFBasePart(THead)
+		else SFBasePart(partToFling) end
+	else
+		return Message("Error", "Target is missing required parts.", 4)
+	end
+	BV:Destroy()
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+	workspace.CurrentCamera.CameraSubject = Humanoid
+	if getgenv().OldPos then
+		repeat
+			RootPart.CFrame = getgenv().OldPos * CFrame.new(0, 0.5, 0)
+			Character:SetPrimaryPartCFrame(getgenv().OldPos * CFrame.new(0, 0.5, 0))
+			Humanoid:ChangeState("GettingUp")
+			for _, x in pairs(Character:GetChildren()) do
+				if x:IsA("BasePart") then x.Velocity, x.RotVelocity = Vector3.new(), Vector3.new() end
+			end
+			task.wait()
+		until (RootPart.Position - getgenv().OldPos.p).Magnitude < 25
+	end
+	workspace.FallenPartsDestroyHeight = -500
+end
+
+hideShowButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = not mainFrame.Visible
+	flingFrame.Visible = not flingFrame.Visible
+	if mainFrame.Visible then
+		hideShowButton.Text = "Hide UI"
+	else
+		hideShowButton.Text = "Show UI"
+	end
+end)
+
+flingTargetButton.MouseButton1Click:Connect(function()
+	local targetName = flingTargetBox.Text
+	if targetName and targetName ~= "" then
+		local targetPlayer = GetPlayer(targetName)
+		if targetPlayer then
+			Message("Flinging", "Attempting to fling " .. targetPlayer.Name, 3)
+			SkidFling(targetPlayer)
+		else
+			Message("Error", "Player '" .. targetName .. "' not found.", 4)
+		end
+	else
+		Message("Error", "Target name cannot be empty.", 4)
+	end
+end)
+
+heaviestButton.MouseButton1Click:Connect(equipHeaviestTool)
+unequipButton.MouseButton1Click:Connect(unequipAllTools)
+poopButton.MouseButton1Click:Connect(togglePoopLoop)
+oneClickSellButton.MouseButton1Click:Connect(sellInventoryOnce)
+autoSellButton.MouseButton1Click:Connect(toggleSellLoop)
+   end,
+})
