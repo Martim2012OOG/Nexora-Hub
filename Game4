@@ -91,6 +91,14 @@ UniversalTab:CreateButton({
     end
 })
 
+-- XVC Hub
+UniversalTab:CreateButton({
+    Name = "XVC Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-XVC-Hub-159-Games-keyless-52467", true))()
+    end
+})
+
 -- ==========================
 -- IN GAME (Game Scripts)
 -- ==========================
