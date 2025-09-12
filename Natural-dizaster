@@ -672,5 +672,5 @@ TextButton1.Visible = true
 TextButton1.Active = true
 
 TextButton1.MouseButton1Click:Connect(function() 
-loadstring(game:HttpGet("https://pastebin.com/raw/ySHJdZpb",true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/A",true))()
 end)
