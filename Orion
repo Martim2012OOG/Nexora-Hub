@@ -100,7 +100,7 @@ UniversalTab:AddButton({
 
 -- R15 Dance Script UNIVERSAL
 UniversalTab:AddButton({
-    Name = "XVC Hub",
+    Name = "R15 Dance Script UNIVERSAL",
     Callback = function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Universal-FE-R15-Animation-Player-47905", true))()
     end
