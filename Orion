@@ -124,6 +124,8 @@ CreateGameButton(InGameTab, "Backpacking ⛺🐻", "https://raw.githubuserconten
 CreateGameButton(InGameTab, "Prospecting💎", "https://raw.githubusercontent.com/x2zu/loader/main/games/Prospecting.lua")
 CreateGameButton(InGameTab, "Build a Plane", "https://raw.githubusercontent.com/NameHubScript/_/refs/heads/main/b.lua")
 CreateGameButton(InGameTab, "Universal Piano🎹", "https://raw.githubusercontent.com/hellohellohell012321/TALENTLESS/main/TALENTLESS")
+CreateGameButton(InGameTab, "Natural Disaster", "https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Natural-dizaster")
+
 
 -- ==========================
 -- DOUBLE JUMP SCRIPT
