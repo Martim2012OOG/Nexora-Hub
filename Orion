@@ -90,6 +90,14 @@ UniversalTab:AddButton({
     end
 })
 
+-- XVC Hub
+UniversalTab:AddButton({
+    Name = "XVC Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-XVC-Hub-159-Games-keyless-52467", true))()
+    end
+})
+
 -- ==========================
 -- ABA IN GAME (Game Scripts)
 -- ==========================
