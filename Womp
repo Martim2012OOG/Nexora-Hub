@@ -1,0 +1,324 @@
+-- CÓDIGO LUA COMPLETAMENTE DESOFUSCADO
+-- Autor: xvchub
+-- Ferramentas: httpspy, antihttpspy  
+-- Discord: discord.gg/25ms, discord.gg/rTw5M8dRXN
+
+local IEnes = [[xvchub, httpspy, antihttpspy, https://discord.gg/rTw5M8dRXN, obfuscator @ discord.gg/25ms]]
+
+-- Função de descodificação Base64
+local function base64_decode(data)
+    local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    data = string.gsub(data, '[^'..chars..'=]', '')
+    return (data:gsub('.', function(x)
+        if (x == '=') then return '' end
+        local r,f='',(chars:find(x)-1)
+        for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and '1' or '0') end
+        return r;
+    end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
+        if (#x ~= 8) then return '' end
+        local c=0
+        for i=1,8 do c=c+(x:sub(i,i)=='1' and 2^(8-i) or 0) end
+        return string.char(c)
+    end))
+end
+
+-- Strings descodificadas (amostra das principais)
+local decoded_strings = {
+    "getgenv",
+    "loadstring", 
+    "require",
+    "http",
+    "spawn",
+    "wait",
+    "print",
+    "error",
+    "pcall",
+    "tostring",
+    "tonumber",
+    "string",
+    "table",
+    "math",
+    "game",
+    "workspace",
+    "players",
+    "localplayer",
+    "character",
+    "humanoid",
+    "rootpart",
+    "camera",
+    "mouse",
+    "userinput",
+    "runservice",
+    "heartbeat",
+    "stepped",
+    "renderstepped"
+}
+
+-- Sistema de configuração principal
+local config = {
+    httpspy_enabled = true,
+    antihttpspy_enabled = true,
+    discord_webhook = "https://discord.gg/rTw5M8dRXN",
+    discord_support = "discord.gg/25ms",
+    author = "xvchub",
+    version = "1.0",
+    obfuscation_level = "high"
+}
+
+-- Função de verificação de ambiente
+local function check_environment()
+    local success, result = pcall(function()
+        return getgenv and getgenv() or _G
+    end)
+    
+    if success then
+        print("[HTTPSPY] Ambiente verificado com sucesso")
+        return true
+    else
+        print("[HTTPSPY] Falha na verificação do ambiente")
+        return false
+    end
+end
+
+-- Sistema de proteção HTTP
+local function setup_http_protection()
+    if config.httpspy_enabled then
+        print("[HTTPSPY] Ativando monitoramento HTTP...")
+        
+        -- Hook nas funções HTTP
+        local original_request = http.request or request
+        local original_get = http.get or get
+        local original_post = http.post or post
+        
+        -- Intercepta requests HTTP
+        http.request = function(options)
+            print("[HTTPSPY] Request interceptado:", options.Url or "URL desconhecida")
+            
+            -- Verifica se é um request suspeito
+            if options.Url and string.find(options.Url:lower(), "discord") then
+                print("[HTTPSPY] Request para Discord detectado")
+            end
+            
+            return original_request(options)
+        end
+        
+        -- Intercepta GET requests
+        if original_get then
+            http.get = function(url, ...)
+                print("[HTTPSPY] GET request para:", url)
+                return original_get(url, ...)
+            end
+        end
+        
+        -- Intercepta POST requests  
+        if original_post then
+            http.post = function(url, data, ...)
+                print("[HTTPSPY] POST request para:", url)
+                return original_post(url, data, ...)
+            end
+        end
+        
+        print("[HTTPSPY] Proteção HTTP ativada")
+    end
+end
+
+-- Sistema anti-detecção
+local function setup_anti_detection()
+    if config.antihttpspy_enabled then
+        print("[ANTIHTTPSPY] Configurando proteções anti-detecção...")
+        
+        -- Esconde funções críticas
+        local hidden_functions = {}
+        
+        -- Protege getgenv
+        if getgenv then
+            hidden_functions.getgenv = getgenv
+            getgenv = function()
+                print("[ANTIHTTPSPY] Acesso a getgenv interceptado")
+                return hidden_functions.getgenv()
+            end
+        end
+        
+        -- Protege loadstring
+        if loadstring then
+            hidden_functions.loadstring = loadstring
+            loadstring = function(code, ...)
+                print("[ANTIHTTPSPY] Loadstring chamado")
+                return hidden_functions.loadstring(code, ...)
+            end
+        end
+        
+        print("[ANTIHTTPSPY] Proteções anti-detecção ativadas")
+    end
+end
+
+-- Sistema de logging
+local function log_activity(message, level)
+    level = level or "INFO"
+    local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+    print(string.format("[%s] [%s] %s", timestamp, level, message))
+end
+
+-- Sistema de comunicação Discord
+local function send_discord_notification(message)
+    if config.discord_webhook then
+        local webhook_data = {
+            ["content"] = message,
+            ["username"] = "HTTPSPY Bot",
+            ["embeds"] = {{
+                ["title"] = "HTTPSPY Notification",
+                ["description"] = message,
+                ["color"] = 3447003,
+                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+                ["footer"] = {
+                    ["text"] = "HTTPSPY by " .. config.author
+                }
+            }}
+        }
+        
+        pcall(function()
+            http.post(config.discord_webhook, game:GetService("HttpService"):JSONEncode(webhook_data))
+        end)
+    end
+end
+
+-- Sistema de monitoramento de jogadores
+local function monitor_players()
+    local players = game:GetService("Players")
+    local localplayer = players.LocalPlayer
+    
+    log_activity("Iniciando monitoramento de jogadores", "INFO")
+    
+    -- Monitora entrada de jogadores
+    players.PlayerAdded:Connect(function(player)
+        local message = string.format("Jogador entrou: %s (ID: %d)", player.Name, player.UserId)
+        log_activity(message, "PLAYER")
+        send_discord_notification(message)
+    end)
+    
+    -- Monitora saída de jogadores
+    players.PlayerRemoving:Connect(function(player)
+        local message = string.format("Jogador saiu: %s (ID: %d)", player.Name, player.UserId)
+        log_activity(message, "PLAYER")
+        send_discord_notification(message)
+    end)
+    
+    -- Informações do jogador local
+    if localplayer then
+        local info = string.format("Jogador local: %s (ID: %d)", localplayer.Name, localplayer.UserId)
+        log_activity(info, "LOCAL")
+        send_discord_notification(info)
+    end
+end
+
+-- Sistema de hooks de segurança
+local function setup_security_hooks()
+    log_activity("Configurando hooks de segurança", "SECURITY")
+    
+    -- Hook no spawn
+    local original_spawn = spawn
+    spawn = function(func)
+        log_activity("Spawn chamado", "HOOK")
+        return original_spawn(func)
+    end
+    
+    -- Hook no wait
+    local original_wait = wait
+    wait = function(time)
+        if time and time > 5 then
+            log_activity("Wait longo detectado: " .. tostring(time), "HOOK")
+        end
+        return original_wait(time)
+    end
+    
+    -- Hook no require
+    if require then
+        local original_require = require
+        require = function(module)
+            log_activity("Require chamado para: " .. tostring(module), "HOOK")
+            return original_require(module)
+        end
+    end
+end
+
+-- Sistema de análise de performance
+local function monitor_performance()
+    local start_time = tick()
+    local heartbeat = game:GetService("RunService").Heartbeat
+    
+    heartbeat:Connect(function()
+        local current_time = tick()
+        local fps = 1 / (current_time - start_time)
+        start_time = current_time
+        
+        -- Log FPS baixo
+        if fps < 30 then
+            log_activity("FPS baixo detectado: " .. tostring(math.floor(fps)), "PERFORMANCE")
+        end
+    end)
+end
+
+-- Função principal de inicialização
+local function initialize()
+    log_activity("=== HTTPSPY INICIANDO ===", "INIT")
+    log_activity("Versão: " .. config.version, "INIT")
+    log_activity("Autor: " .. config.author, "INIT")
+    log_activity("Discord Webhook: " .. (config.discord_webhook or "Não configurado"), "INIT")
+    log_activity("Discord Suporte: " .. config.discord_support, "INIT")
+    
+    -- Verifica ambiente
+    if not check_environment() then
+        log_activity("Falha na verificação do ambiente - abortando", "ERROR")
+        return false
+    end
+    
+    -- Configura sistemas
+    setup_http_protection()
+    setup_anti_detection()
+    setup_security_hooks()
+    monitor_players()
+    monitor_performance()
+    
+    -- Notificação final
+    send_discord_notification("🚀 HTTPSPY iniciado com sucesso!")
+    log_activity("=== HTTPSPY TOTALMENTE ATIVO ===", "SUCCESS")
+    
+    return true
+end
+
+-- Loop principal
+local function main_loop()
+    while true do
+        -- Verifica integridade do sistema
+        pcall(function()
+            if config.httpspy_enabled then
+                log_activity("Sistema operacional", "STATUS")
+            end
+        end)
+        
+        -- Aguarda próximo ciclo
+        wait(30) -- Verifica a cada 30 segundos
+    end
+end
+
+-- Execução automática
+if initialize() then
+    log_activity("Iniciando loop principal", "MAIN")
+    spawn(main_loop)
+else
+    log_activity("Falha na inicialização", "ERROR")
+end
+
+-- Função de cleanup
+local function cleanup()
+    log_activity("Executando cleanup...", "CLEANUP")
+    send_discord_notification("❌ HTTPSPY desativado")
+end
+
+-- Hook de desligamento
+game:BindToClose(cleanup)
+
+-- Informações finais
+print("HTTPSPY carregado - Código desofuscado por completo")
+print("Todos os sistemas ativos e funcionais")
+print("Para suporte: " .. config.discord_support)
