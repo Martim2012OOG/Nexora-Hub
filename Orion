@@ -142,6 +142,7 @@ CreateGameButton(InGameTab, "Prospecting💎", "https://raw.githubusercontent.co
 CreateGameButton(InGameTab, "Build a Plane", "https://raw.githubusercontent.com/NameHubScript/_/refs/heads/main/b.lua")
 CreateGameButton(InGameTab, "Universal Piano🎹", "https://raw.githubusercontent.com/hellohellohell012321/TALENTLESS/main/TALENTLESS")
 CreateGameButton(InGameTab, "Natural Disaster Survival", "https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Natural-dizaster")
+CreateGameButton(InGameTab, "99 Nights In The Florest", "https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua")
 
 
 -- ==========================
