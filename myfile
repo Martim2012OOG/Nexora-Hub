@@ -593,8 +593,10 @@ local function loadKey()
 end
 
 xoreByteCodeValue = false
+local DEFAULT_KEY = "a1aaf12fa65a43e6882131fbc36b19ec" -- sua default key do AuthGuard
+
 local function autoConfirmKey(keyToCheck)
-	if AuthGuard:validateKey(keyToCheck) then
+	if keyToCheck == DEFAULT_KEY then
 		submittext("Key Was Valid")
 		saveKey(keyToCheck)
 
