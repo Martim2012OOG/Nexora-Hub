@@ -1,5 +1,5 @@
 local runMainScript = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/nursehub-sys/keyguardian/refs/heads/main/Universal"))()   -- change this with your script
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/MainFile"))()   -- change this with your script
 end
 getgenv().AuthGuardSettings = {
     Script_Title = "Nexora Hub",    -- Tittle shown in the UI
