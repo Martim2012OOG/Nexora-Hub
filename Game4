@@ -144,6 +144,7 @@ CreateGameButton(InGameTab, "Build a Plane", "https://raw.githubusercontent.com/
 CreateGameButton(InGameTab, "Universal Piano🎹", "https://raw.githubusercontent.com/hellohellohell012321/TALENTLESS/main/TALENTLESS")
 CreateGameButton(InGameTab, "Natural Disaster Survival", "https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Natural-dizaster")
 CreateGameButton(InGameTab, "99 Nights In The Florest", "https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua")
+CreateGameButton(InGameTab, "Steal a Brainrot", "https://raw.githubusercontent.com/bananaGanteng/Legend/refs/heads/main/Steal%20a%20Brainrot")
 
 
 -- ==========================
