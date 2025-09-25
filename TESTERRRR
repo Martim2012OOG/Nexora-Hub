@@ -28,6 +28,7 @@ local KSresponse = KeysystemLibrary:Init({
 if not KSresponse or not KeyValid then return end 
 
 -- YOUR SCRIPT HERE
+loadstring(game:HttpGet("https://github.com/Martim2012OOG/Nexora-Hub/blob/main/MainFile", true))()
 
 -- Example of checking is user have a premium:
 if KeyPremium then
