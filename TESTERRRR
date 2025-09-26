@@ -1,15 +1,15 @@
 local KeyValid,KeyPremium, KeysystemLibrary, KeyGuardLibrary = false,false,loadstring(game:HttpGet("https://raw.githubusercontent.com/OopssSorry/LuaU-Free-Key-System-UI/main/source.lua"))(),loadstring(game:HttpGet("https://cdn.keyguardian.org/library/v1.0.0.lua"))()
 
 KeyGuardLibrary.Set({
-	publicToken = "0bd7ecc0f11c46eeb41f2e9eaceeb93f",
-	privateToken = "9b8ac0774e934b92b098d71141891568",
-	trueData = "21402abd6a694312957e947824cffa82",
-	falseData = "979f3b883ccf4b18862c3796b61a9d26",
+	publicToken = "your publicToken",
+	privateToken = "your privateToken",
+	trueData = "your trueData",
+	falseData = "your falseData",
 })
 
 -- https://github.com/OopssSorry/LuaU-Free-Key-System-UI
 local KSresponse = KeysystemLibrary:Init({
-	Title="Nexora Hub Key System",  -- TITLE HERE
+	Title="ExampleHub",  -- TITLE HERE
 	
 	SaveKey=true, 
 	Debug=false, 
@@ -28,7 +28,6 @@ local KSresponse = KeysystemLibrary:Init({
 if not KSresponse or not KeyValid then return end 
 
 -- YOUR SCRIPT HERE
-loadstring(game:HttpGet("https://github.com/Martim2012OOG/Nexora-Hub/blob/main/MainFile", true))()
 
 -- Example of checking is user have a premium:
 if KeyPremium then
