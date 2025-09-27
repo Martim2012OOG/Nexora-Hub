@@ -1,75 +1,180 @@
--- Criar ScreenGui
+--// Services
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+--// Colors & Style
+local Colors = {
+    Primary = Color3.fromRGB(50, 130, 230),
+    Accent = Color3.fromRGB(70, 170, 255),
+    Background = Color3.fromRGB(18, 18, 18),
+    Text = Color3.fromRGB(255, 255, 255),
+    Error = Color3.fromRGB(220, 50, 50),
+    Success = Color3.fromRGB(0, 220, 0),
+}
+
+--// ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DeviceSelectorGui"
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "NexoraHub"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- Criar Frame principal
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 300, 0, 150)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.BorderSizePixel = 0
-Frame.Parent = ScreenGui
+--// Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 600, 0, 450)
+MainFrame.Position = UDim2.new(0.5, -300, -1, -225)
+MainFrame.BackgroundColor3 = Colors.Background
+MainFrame.BorderSizePixel = 0
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Parent = ScreenGui
+local Corner = Instance.new("UICorner", MainFrame)
+Corner.CornerRadius = UDim.new(0, 30)
 
-local Corner = Instance.new("UICorner")
-Corner.CornerRadius = UDim.new(0, 10)
-Corner.Parent = Frame
+-- Gradient animated
+local Gradient = Instance.new("UIGradient", MainFrame)
+Gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Colors.Primary), ColorSequenceKeypoint.new(1, Colors.Accent)})
+Gradient.Rotation = 45
 
--- Título
+-- Shadow
+local Shadow = Instance.new("UIStroke", MainFrame)
+Shadow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Shadow.Color = Color3.fromRGB(10,10,10)
+Shadow.Thickness = 5
+
+--// Title
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Size = UDim2.new(1, 0, 0, 80)
+Title.Position = UDim2.new(0,0,0,0)
 Title.BackgroundTransparency = 1
-Title.Text = "Device"
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 24
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Parent = Frame
+Title.Text = "NEXORA HUB"
+Title.TextColor3 = Colors.Text
+Title.Font = Enum.Font.GothamBlack
+Title.TextScaled = true
+Title.Parent = MainFrame
 
--- Botão Mobile
-local MobileButton = Instance.new("TextButton")
-MobileButton.Size = UDim2.new(0.4, 0, 0.4, 0)
-MobileButton.Position = UDim2.new(0.05, 0, 0.5, 0)
-MobileButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-MobileButton.Text = "Mobile"
-MobileButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-MobileButton.Font = Enum.Font.SourceSansBold
-MobileButton.TextSize = 20
-MobileButton.Parent = Frame
+-- Glow under title
+local TitleGlow = Instance.new("Frame")
+TitleGlow.Size = UDim2.new(1,0,0,6)
+TitleGlow.Position = UDim2.new(0,0,0,80)
+TitleGlow.BackgroundColor3 = Colors.Primary
+TitleGlow.BackgroundTransparency = 0.5
+TitleGlow.Parent = MainFrame
 
-local CornerMobile = Instance.new("UICorner")
-CornerMobile.CornerRadius = UDim.new(0, 8)
-CornerMobile.Parent = MobileButton
+--// Close Button
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 60, 0, 60)
+CloseBtn.Position = UDim2.new(1, -70, 0, 10)
+CloseBtn.BackgroundColor3 = Colors.Error
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Colors.Text
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextScaled = true
+CloseBtn.Parent = MainFrame
+local CloseCorner = Instance.new("UICorner", CloseBtn)
+CloseCorner.CornerRadius = UDim.new(0, 20)
 
--- Botão PC
-local PCButton = Instance.new("TextButton")
-PCButton.Size = UDim2.new(0.4, 0, 0.4, 0)
-PCButton.Position = UDim2.new(0.55, 0, 0.5, 0)
-PCButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-PCButton.Text = "PC"
-PCButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-PCButton.Font = Enum.Font.SourceSansBold
-PCButton.TextSize = 20
-PCButton.Parent = Frame
+CloseBtn.MouseEnter:Connect(function()
+    TweenService:Create(CloseBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255,80,80)}):Play()
+end)
+CloseBtn.MouseLeave:Connect(function()
+    TweenService:Create(CloseBtn, TweenInfo.new(0.2), {BackgroundColor3 = Colors.Error}):Play()
+end)
+CloseBtn.MouseButton1Click:Connect(function()
+    TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {Position = UDim2.new(0.5, -300, -1, -225)}):Play()
+    wait(0.5)
+    ScreenGui:Destroy()
+end)
 
-local CornerPC = Instance.new("UICorner")
-CornerPC.CornerRadius = UDim.new(0, 8)
-CornerPC.Parent = PCButton
+--// Button function
+local function CreateButton(text, position, parent)
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(0, 270, 0, 80)
+    Btn.Position = position
+    Btn.BackgroundColor3 = Colors.Primary
+    Btn.Text = text
+    Btn.TextColor3 = Colors.Text
+    Btn.Font = Enum.Font.GothamBold
+    Btn.TextScaled = true
+    Btn.Parent = parent
 
--- Função para executar script e destruir GUI depois
-local function ExecuteScript(url)
-    spawn(function()
-        loadstring(game:HttpGet(url, true))()
-        ScreenGui:Destroy()
+    local Corner = Instance.new("UICorner", Btn)
+    Corner.CornerRadius = UDim.new(0, 25)
+
+    local Glow = Instance.new("UIStroke", Btn)
+    Glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    Glow.Color = Colors.Accent
+    Glow.Thickness = 3
+
+    Btn.MouseEnter:Connect(function()
+        TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = Colors.Accent}):Play()
     end)
+    Btn.MouseLeave:Connect(function()
+        TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = Colors.Primary}):Play()
+    end)
+    return Btn
 end
 
--- Conexão dos botões
-MobileButton.MouseButton1Click:Connect(function()
-    ExecuteScript("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Orion")
+--// Luna Library Button
+local LunaBtn = CreateButton("LUNA LIBRARY", UDim2.new(0.5, -135, 0.5, -40), MainFrame)
+LunaBtn.MouseButton1Click:Connect(function()
+    LunaBtn.Text = "EXECUTANDO..."
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/luna"))()
+    end)
+    if success then
+        LunaBtn.Text = "EXECUTADO!"
+        TweenService:Create(LunaBtn, TweenInfo.new(0.3), {BackgroundColor3 = Colors.Success}):Play()
+    else
+        LunaBtn.Text = "FALHA!"
+        TweenService:Create(LunaBtn, TweenInfo.new(0.3), {BackgroundColor3 = Colors.Error}):Play()
+        warn("Erro ao executar Luna Library: ".. tostring(err))
+    end
 end)
 
-PCButton.MouseButton1Click:Connect(function()
-    ExecuteScript("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Game4")
+--// Make GUI draggable
+local Dragging, DragInput, DragStart, StartPos
+local function UpdateInput(input)
+    local Delta = input.Position - DragStart
+    MainFrame.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        Dragging = true
+        DragStart = input.Position
+        StartPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                Dragging = false
+            end
+        end)
+    end
 end)
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        DragInput = input
+    end
+end)
+RunService.RenderStepped:Connect(function()
+    if Dragging and DragInput then
+        UpdateInput(DragInput)
+    end
+end)
+
+--// Entrance animation
+TweenService:Create(MainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Bounce), {Position = UDim2.new(0.5, -300, 0.5, -225)}):Play()
+
+--// Floating particles
+for i=1,25 do
+    local Particle = Instance.new("Frame")
+    Particle.Size = UDim2.new(0, math.random(3,6), 0, math.random(3,6))
+    Particle.Position = UDim2.new(math.random(),0,math.random(),0)
+    Particle.BackgroundColor3 = Colors.Primary
+    Particle.BackgroundTransparency = 0.5
+    Particle.BorderSizePixel = 0
+    Particle.Rotation = math.random(0,360)
+    Particle.Parent = MainFrame
+    TweenService:Create(Particle, TweenInfo.new(math.random(4,8), Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), {Position = UDim2.new(math.random(),0,math.random(),0)}):Play()
+end
