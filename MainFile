@@ -22,15 +22,17 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 --// Main Frame
+--// Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 600, 0, 450)
-MainFrame.Position = UDim2.new(0.5, -300, -1, -225)
+MainFrame.Size = UDim2.new(0, 400, 0, 300) -- menor, mobile friendly
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) -- exatamente no centro da tela
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5) -- mantém centralizado corretamente
 MainFrame.BackgroundColor3 = Colors.Background
 MainFrame.BorderSizePixel = 0
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Parent = ScreenGui
 local Corner = Instance.new("UICorner", MainFrame)
-Corner.CornerRadius = UDim.new(0, 30)
+Corner.CornerRadius = UDim.new(0, 20) -- ajustado para o novo tamanho
+
 
 -- Gradient animated
 local Gradient = Instance.new("UIGradient", MainFrame)
