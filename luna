@@ -1,0 +1,166 @@
+-- Carregar a Library do Luna
+local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/master/source.lua"))()
+
+-- Criar a Window
+local Window = Luna:CreateWindow({
+    Name = "Nexora Hub",
+    Subtitle = "By Nexora Hub",
+    LogoID = nil,
+    LoadingEnabled = true,
+    LoadingTitle = "Nexora Hub",
+    LoadingSubtitle = "By Nexora Hub",
+    ConfigSettings = {
+        RootFolder = nil,
+        ConfigFolder = "NexoraHub"
+    },
+    KeySystem = false
+})
+
+-- ==========================
+-- Aba Universal
+-- ==========================
+local UniversalTab = Window:CreateTab({
+    Name = "Universal",
+    Icon = "settings",
+    ImageSource = "Material",
+    ShowTitle = true
+})
+
+-- Fly Script
+UniversalTab:CreateButton({
+    Name = "Fly Script",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/fly"))()
+    end
+})
+
+-- Max Jumps Slider
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+local function updateMaxJumps(value)
+    local character = localPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.JumpPower = 50 * value -- exemplo: 50 * quantidade de jumps
+    end
+end
+
+local maxJumps = 2
+UniversalTab:CreateSlider({
+    Name = "Max Jumps",
+    Min = 1,
+    Max = 1000,
+    Default = maxJumps,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "jumps",
+    Callback = function(Value)
+        maxJumps = Value
+        updateMaxJumps(maxJumps)
+        print("Max Jumps set to:", maxJumps)
+    end
+})
+
+-- AimBot
+UniversalTab:CreateButton({
+    Name = "AimBot (PC)",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/aim'))()
+    end
+})
+
+-- Teleport
+UniversalTab:CreateButton({
+    Name = "Teleport",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Roblo-Tp-Scripts/main/Tp.lua'))()
+    end
+})
+
+-- Infinite Yield
+UniversalTab:CreateButton({
+    Name = "Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+-- Dex Explorer
+UniversalTab:CreateButton({
+    Name = "Dex Explorer",
+    Callback = function()
+        loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Dex%20Explorer.lua"))()
+    end
+})
+
+-- Reach
+UniversalTab:CreateButton({
+    Name = "Reach",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Reach"))()
+    end
+})
+
+-- Roblox EGOR
+UniversalTab:CreateButton({
+    Name = "Roblox EGOR",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/GBmWn4eZ", true))()
+    end
+})
+
+-- XVC Hub
+UniversalTab:CreateButton({
+    Name = "XVC Hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-XVC-Hub-159-Games-keyless-52467", true))()
+    end
+})
+
+-- R15 Dance Script UNIVERSAL
+UniversalTab:CreateButton({
+    Name = "R15 Dance Script UNIVERSAL",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Universal-FE-R15-Animation-Player-47905", true))()
+    end
+})
+
+-- ==========================
+-- Aba Game Scripts
+-- ==========================
+local GameTab = Window:CreateTab({
+    Name = "Game Scripts",
+    Icon = "sports_esports",
+    ImageSource = "Material",
+    ShowTitle = true
+})
+
+-- Função helper para criar botões de Game Scripts
+local function CreateGameButton(tab, name, url)
+    tab:CreateButton({
+        Name = name,
+        Callback = function()
+            local success, err = pcall(function()
+                loadstring(game:HttpGet(url, true))()
+            end)
+            if not success then
+                warn("[Nexora Hub] Erro ao carregar script: " .. tostring(err))
+            end
+        end
+    })
+end
+
+-- Adicionar scripts no GameTab
+CreateGameButton(GameTab, "[2X]🏀Basketball Legends🏀", "https://raw.githubusercontent.com/vnausea/absence-mini/refs/heads/main/absencemini.lua")
+CreateGameButton(GameTab, "Grow a Garden Spawner(Visual)", "https://raw.githubusercontent.com/iwantsom3/script/refs/heads/main/Gag")
+CreateGameButton(GameTab, "OP Reach Script", "https://raw.githubusercontent.com/MaxicsSoft/XyrezAutoRank/main/StealTimeFromOthers.lua")
+CreateGameButton(GameTab, "Steal a Brainrot", "https://raw.githubusercontent.com/Jake-Brock/Scripts/main/Fw%20SAB.lua")
+CreateGameButton(GameTab, "Backpacking ⛺🐻", "https://raw.githubusercontent.com/Martim2012OOG/Roblox/refs/heads/main/Game")
+CreateGameButton(GameTab, "Prospecting💎", "https://raw.githubusercontent.com/x2zu/loader/main/games/Prospecting.lua")
+CreateGameButton(GameTab, "Build a Plane", "https://raw.githubusercontent.com/NameHubScript/_/refs/heads/main/b.lua")
+CreateGameButton(GameTab, "Universal Piano🎹", "https://raw.githubusercontent.com/hellohellohell012321/TALENTLESS/main/TALENTLESS")
+CreateGameButton(GameTab, "Natural Disaster Survival", "https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/Natural-dizaster")
+CreateGameButton(GameTab, "99 Nights In The Florest", "https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua")
+CreateGameButton(GameTab, "Steal a Brainrot", "https://raw.githubusercontent.com/bananaGanteng/Legend/refs/heads/main/Steal%20a%20Brainrot")
+
+-- Finalizar (autoload configs)
+Luna:LoadAutoloadConfig()
