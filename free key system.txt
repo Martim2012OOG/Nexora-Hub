@@ -1,0 +1,6 @@
+local function loadscript()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() -- Change this with your script
+end
+
+-- GUI Creations (dont change after this)
+loadstring(game:HttpGet('https://raw.githubusercontent.com/key-sysbox/keysystem/refs/heads/main/Library'))()(loadscript)
