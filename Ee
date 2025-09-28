@@ -1,0 +1,383 @@
+-- Nexora Hub - Key GUI (pronto)
+-- Features:
+--  - Uses AuthGuard (placeholder __SERVICE_ID__) for GetKeyLink & ValidateKey
+--  - Saves key locally (1 day TTL) using writefile/readfile when available
+--  - Fallback to custom HTTP validate if you set VALIDATE_URL_BASE
+--  - Arrastável, mobile-friendly, status, logout, auto-load when key valid
+-- CONFIG: change MAIN_LOADSTRING_URL to your script (if needed)
+local SERVICE_PLACEHOLDER = "__SERVICE_ID__" -- leave as-is for AuthGuard obfuscation
+local MAIN_LOADSTRING_URL = "https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/luna" -- edit if you want to point elsewhere
+local SAVE_FILENAME = "NexoraHubKey.json" -- local file used to persist key
+local DEFAULT_TTL_SECONDS = 86400 -- 1 day
+-- If you don't use AuthGuard and have your own validation API, set this to "https://yourdomain.com"
+local VALIDATE_URL_BASE = nil
+
+-- Services
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Executor file API detection
+local has_isfile = type(isfile) == "function"
+local has_readfile = type(readfile) == "function"
+local has_writefile = type(writefile) == "function"
+local has_delfile = type(delfile) == "function"
+
+local function fileExists(path)
+    if has_isfile then return isfile(path) end
+    if has_readfile then
+        local ok, _ = pcall(function() readfile(path) end)
+        return ok
+    end
+    return false
+end
+local function fileRead(path)
+    if has_readfile then
+        return readfile(path)
+    end
+    return nil
+end
+local function fileWrite(path, content)
+    if has_writefile then
+        pcall(function() writefile(path, content) end)
+        return true
+    end
+    return false
+end
+local function fileDelete(path)
+    if has_delfile then
+        pcall(function() delfile(path) end)
+        return true
+    end
+    if fileExists(path) and has_writefile then
+        pcall(function() writefile(path, "") end)
+        return true
+    end
+    return false
+end
+
+-- persistence helpers
+local function saveKeyObject(obj)
+    local ok, json = pcall(function() return HttpService:JSONEncode(obj) end)
+    if not ok then return false end
+    return fileWrite(SAVE_FILENAME, json)
+end
+local function loadKeyObject()
+    if not fileExists(SAVE_FILENAME) then return nil end
+    local raw = fileRead(SAVE_FILENAME)
+    if not raw or raw == "" then return nil end
+    local ok, obj = pcall(function() return HttpService:JSONDecode(raw) end)
+    if not ok then return nil end
+    return obj
+end
+
+-- format time remaining
+local function formatRemaining(expiryEpoch)
+    if not expiryEpoch then return "N/A" end
+    local now = os.time()
+    local diff = expiryEpoch - now
+    if diff <= 0 then return "Expired" end
+    local days = math.floor(diff / 86400); diff = diff % 86400
+    local hours = math.floor(diff / 3600); diff = diff % 3600
+    local minutes = math.floor(diff / 60); local seconds = diff % 60
+    if days > 0 then return string.format("%dd %dh", days, hours) end
+    if hours > 0 then return string.format("%dh %dm", hours, minutes) end
+    if minutes > 0 then return string.format("%dm %ds", minutes, seconds) end
+    return string.format("%ds", seconds)
+end
+
+-- validate via AuthGuard (preferred) or via HTTP fallback
+local function validateWithAuthGuard(key)
+    if type(AuthGuard) ~= "table" or type(AuthGuard.ValidateKey) ~= "function" then
+        return nil, "AuthGuard not available"
+    end
+    local ok, res = pcall(function()
+        return AuthGuard.ValidateKey({ Service = SERVICE_PLACEHOLDER, Key = key })
+    end)
+    if not ok then
+        return nil, "AuthGuard call error: " .. tostring(res)
+    end
+    if res == "invalid" then
+        return false, "invalid"
+    end
+    -- if validated, AuthGuard sets AG_ExpiredAt et al (per docs)
+    local expiresAt = nil
+    if type(AG_ExpiredAt) == "number" then expiresAt = AG_ExpiredAt end
+    return true, {
+        expiresAt = expiresAt,
+        hwid = AG_Hwid,
+        isPremium = AG_IsPremium,
+        discordId = AG_DiscordId
+    }
+end
+
+local function validateWithHTTP(key)
+    if not VALIDATE_URL_BASE then return nil, "No HTTP fallback configured" end
+    local hwid = tostring(LocalPlayer.UserId)
+    local url = string.format("%s/api/validate?key=%s&service=%s&hwid=%s",
+        VALIDATE_URL_BASE,
+        HttpService:UrlEncode(key),
+        HttpService:UrlEncode(SERVICE_PLACEHOLDER),
+        HttpService:UrlEncode(hwid)
+    )
+    local ok, res = pcall(function() return HttpService:GetAsync(url, true) end)
+    if not ok then return nil, "HTTP request failed: " .. tostring(res) end
+    local ok2, data = pcall(function() return HttpService:JSONDecode(res) end)
+    if not ok2 then return nil, "Invalid JSON response" end
+    if not data.valid then return false, data.reason or "invalid" end
+    return true, {
+        expiresAt = data.expiresAt,
+        hwid = data.hwid,
+        isPremium = data.isPremium,
+        discordId = data.discordId
+    }
+end
+
+local function validateKey(key)
+    -- Try AuthGuard first
+    local r, info = validateWithAuthGuard(key)
+    if r ~= nil then return r, info end
+    -- else try HTTP fallback
+    local r2, info2 = validateWithHTTP(key)
+    return r2, info2
+end
+
+-- load main script safely
+local function loadMainScript()
+    local ok, body = pcall(function() return game:HttpGet(MAIN_LOADSTRING_URL, true) end)
+    if not ok then return false, tostring(body) end
+    local ok2, err = pcall(function() loadstring(body)() end)
+    if not ok2 then return false, tostring(err) end
+    return true
+end
+
+-- Build GUI (centered, mobile-friendly)
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+if PlayerGui:FindFirstChild("NexoraHub_KeyGUI") then PlayerGui.NexoraHub_KeyGUI:Destroy() end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "NexoraHub_KeyGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = PlayerGui
+
+local main = Instance.new("Frame")
+main.Name = "Main"
+main.Size = UDim2.new(0, 420, 0, 200)
+main.Position = UDim2.new(0.5, 0, 0.5, 0)
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.BackgroundColor3 = Color3.fromRGB(20,20,25)
+main.BorderSizePixel = 0
+main.Parent = screenGui
+local corner = Instance.new("UICorner", main); corner.CornerRadius = UDim.new(0,12)
+
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, -20, 0, 34)
+title.Position = UDim2.new(0, 10, 0, 10)
+title.BackgroundTransparency = 1
+title.Text = "Nexora Hub — Key"
+title.TextColor3 = Color3.fromRGB(240,240,240)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+local status = Instance.new("TextLabel", main)
+status.Size = UDim2.new(1, -20, 0, 18)
+status.Position = UDim2.new(0, 10, 0, 44)
+status.BackgroundTransparency = 1
+status.Text = ""
+status.TextColor3 = Color3.fromRGB(170,170,170)
+status.Font = Enum.Font.Gotham
+status.TextSize = 14
+status.TextXAlignment = Enum.TextXAlignment.Left
+
+local keyBox = Instance.new("TextBox", main)
+keyBox.Size = UDim2.new(1, -140, 0, 42)
+keyBox.Position = UDim2.new(0, 10, 0, 70)
+keyBox.PlaceholderText = "Cola aqui a tua key..."
+keyBox.Text = ""
+keyBox.ClearTextOnFocus = false
+keyBox.Font = Enum.Font.Gotham
+keyBox.TextSize = 16
+local kbCorner = Instance.new("UICorner", keyBox); kbCorner.CornerRadius = UDim.new(0,8)
+
+local getBtn = Instance.new("TextButton", main)
+getBtn.Size = UDim2.new(0, 110, 0, 42)
+getBtn.Position = UDim2.new(1, -120, 0, 70)
+getBtn.Text = "Obter Key"
+getBtn.Font = Enum.Font.GothamBold
+local getCorner = Instance.new("UICorner", getBtn); getCorner.CornerRadius = UDim.new(0,8)
+
+local validateBtn = Instance.new("TextButton", main)
+validateBtn.Size = UDim2.new(0, 200, 0, 42)
+validateBtn.Position = UDim2.new(0.5, -100, 0, 120)
+validateBtn.Text = "Validar e Carregar"
+validateBtn.Font = Enum.Font.GothamBold
+local valCorner = Instance.new("UICorner", validateBtn); valCorner.CornerRadius = UDim.new(0,8)
+
+local logoutBtn = Instance.new("TextButton", main)
+logoutBtn.Size = UDim2.new(0, 110, 0, 28)
+logoutBtn.Position = UDim2.new(1, -120, 1, -40)
+logoutBtn.Text = "Logout (Apagar)"
+logoutBtn.Font = Enum.Font.Gotham
+local loCorner = Instance.new("UICorner", logoutBtn); loCorner.CornerRadius = UDim.new(0,8)
+
+local remainingLabel = Instance.new("TextLabel", main)
+remainingLabel.Size = UDim2.new(0.6, -10, 0, 20)
+remainingLabel.Position = UDim2.new(0, 10, 1, -40)
+remainingLabel.BackgroundTransparency = 1
+remainingLabel.Text = "Nenhuma key guardada"
+remainingLabel.Font = Enum.Font.Gotham
+remainingLabel.TextColor3 = Color3.fromRGB(170,170,170)
+remainingLabel.TextSize = 14
+remainingLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- small helpers
+local function setStatus(txt, color)
+    status.Text = txt or ""
+    status.TextColor3 = color or Color3.fromRGB(170,170,170)
+end
+
+-- Dragging (mobile + pc)
+local dragging, dragInput, dragStart, startPos
+main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = main.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+main.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+RunService.RenderStepped:Connect(function()
+    if dragging and dragInput then
+        local delta = dragInput.Position - dragStart
+        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- auto-load saved key
+local function tryAutoLoad()
+    local data = loadKeyObject()
+    if not data or not data.key or data.key == "" then
+        setStatus("Sem key salva.", Color3.fromRGB(200,200,200))
+        remainingLabel.Text = "Sem key guardada"
+        return false
+    end
+    local expiry = tonumber(data.expires) or 0
+    if expiry > os.time() then
+        remainingLabel.Text = "Key guardada — restante: " .. formatRemaining(expiry)
+        setStatus("Validando key guardada...", Color3.fromRGB(200,200,0))
+        local ok, info = validateKey(data.key)
+        if ok == true then
+            -- if server returned expiry, use it; else stick with saved
+            if type(info) == "table" and info.expiresAt and tonumber(info.expiresAt) then
+                expiry = tonumber(info.expiresAt)
+                saveKeyObject({ key = data.key, expires = expiry })
+                remainingLabel.Text = "Key guardada — restante: " .. formatRemaining(expiry)
+            end
+            setStatus("Key válida! A carregar...", Color3.fromRGB(0,200,0))
+            local loaded, err = loadMainScript()
+            if loaded then
+                setStatus("Script carregado.", Color3.fromRGB(0,200,0))
+            else
+                setStatus("Erro ao carregar: "..tostring(err), Color3.fromRGB(200,50,50))
+            end
+            return true
+        else
+            -- invalid
+            saveKeyObject({ key = "", expires = 0 })
+            setStatus("Key inválida/expirada. Insere nova.", Color3.fromRGB(200,50,50))
+            remainingLabel.Text = "Key inválida/expirada"
+            return false
+        end
+    else
+        setStatus("Key expirada. Insere nova.", Color3.fromRGB(200,50,50))
+        remainingLabel.Text = "Key expirada"
+        return false
+    end
+end
+
+-- UI buttons
+getBtn.MouseButton1Click:Connect(function()
+    setStatus("A obter link...", Color3.fromRGB(200,200,0))
+    local ok, link = pcall(function()
+        -- Use AuthGuard GetKeyLink with placeholder; obfuscation will inject the real service id
+        if type(AuthGuard) == "table" and type(AuthGuard.GetKeyLink) == "function" then
+            return AuthGuard.GetKeyLink({ Service = SERVICE_PLACEHOLDER })
+        else
+            error("AuthGuard lib not available")
+        end
+    end)
+    if ok and link then
+        -- try copy to clipboard when available
+        pcall(function() setclipboard(link) end)
+        setStatus("Link obtido (copiado se suportado). Abre no browser.", Color3.fromRGB(100,200,100))
+        remainingLabel.Text = "Abre/copia o link para gerar key"
+    else
+        setStatus("Não foi possível obter link via AuthGuard.", Color3.fromRGB(200,50,50))
+        remainingLabel.Text = "Se não usas AuthGuard, configura VALIDATE_URL_BASE"
+    end
+end)
+
+validateBtn.MouseButton1Click:Connect(function()
+    local key = tostring(keyBox.Text or ""):gsub("%s+", "")
+    if key == "" then setStatus("Insere a key primeiro.", Color3.fromRGB(220,220,50)); return end
+    setStatus("A validar key...", Color3.fromRGB(200,200,0))
+    local ok, info = validateKey(key)
+    if ok == nil then
+        setStatus("Validação indisponível (AuthGuard/HTTP falharam).", Color3.fromRGB(200,50,50))
+        return
+    end
+    if ok == false then
+        setStatus("Key inválida: "..tostring(info), Color3.fromRGB(200,50,50))
+        return
+    end
+    -- success: determine expiry
+    local expiry = nil
+    if type(info) == "table" and info.expiresAt and tonumber(info.expiresAt) then
+        expiry = tonumber(info.expiresAt)
+    else
+        expiry = os.time() + DEFAULT_TTL_SECONDS
+    end
+    saveKeyObject({ key = key, expires = expiry })
+    remainingLabel.Text = "Tempo restante: " .. formatRemaining(expiry)
+    setStatus("Key validada e guardada. A carregar...", Color3.fromRGB(0,200,0))
+    local ok2, err = loadMainScript()
+    if ok2 then setStatus("Script carregado.", Color3.fromRGB(0,200,0)) else setStatus("Erro ao carregar: "..tostring(err), Color3.fromRGB(200,50,50)) end
+end)
+
+logoutBtn.MouseButton1Click:Connect(function()
+    fileDelete(SAVE_FILENAME)
+    keyBox.Text = ""
+    remainingLabel.Text = "Sem key guardada"
+    setStatus("Key apagada.", Color3.fromRGB(200,50,50))
+end)
+
+-- auto attempt on start
+spawn(function()
+    wait(0.15)
+    local ok = tryAutoLoad()
+    if not ok then
+        local d = loadKeyObject()
+        if d and d.key and d.key ~= "" then keyBox.Text = d.key end
+    end
+end)
+
+-- update remaining label periodically
+spawn(function()
+    while screenGui.Parent do
+        local d = loadKeyObject()
+        if d and d.expires and tonumber(d.expires) and tonumber(d.expires) > 0 then
+            remainingLabel.Text = "Tempo restante: " .. formatRemaining(tonumber(d.expires))
+        end
+        wait(30)
+    end
+end)
