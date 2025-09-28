@@ -2,9 +2,9 @@ local runMainScript = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Martim2012OOG/Nexora-Hub/refs/heads/main/MainFile"))()   -- change this with your script
 end
 getgenv().AuthGuardSettings = {
-    Script_Title = "Script Name",    -- Tittle shown in the UI
+    Script_Title = "Nexora Hub",    -- Tittle shown in the UI
     KeyExpiration = 24,
-    InviteCode = "https://discord.gg/H8n4CPHaW9"
+    InviteCode = "https://discord.gg/kcfFtzrHTx"
 }
 
 local fileName = "AuthKey.txt"
@@ -645,3 +645,4 @@ repeat task.wait() until xoreByteCodeValue
 xoreByteCodeValue = false
 
 delui(true)
+
