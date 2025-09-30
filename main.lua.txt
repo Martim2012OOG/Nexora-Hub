@@ -5,7 +5,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "Nexora Hub - 99 Nights in the Forest",
-    Icon = "rbxassetid://85621113811122",
+    Icon = "rbxassetid://123225954103454",
     Folder = "VEX OP",
     Size = UDim2.fromOffset(580, 460),
     Transparent = true,
