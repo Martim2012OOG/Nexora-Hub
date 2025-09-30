@@ -18,7 +18,6 @@ local Window = WindUI:CreateWindow({
 })
 
 local Tabs = {
-    Discord = Window:Tab({ Title = "Discord", Icon = "bell" }),
     Main = Window:Tab({ Title = "Main", Icon = "swords" }),
     ESP = Window:Tab({ Title = "ESP", Icon = "radar" }),
     Bring = Window:Tab({ Title = "Bring", Icon = "box" }),
