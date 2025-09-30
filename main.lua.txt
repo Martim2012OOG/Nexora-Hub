@@ -5,7 +5,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "VEX OP - 99 Nights in the Forest",
-    Icon = "rbxassetid://86958834463274",
+    Icon = "rbxassetid://85621113811122",
     Folder = "VEX OP",
     Size = UDim2.fromOffset(580, 460),
     Transparent = true,
