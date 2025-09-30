@@ -1,0 +1,88 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+
+-- Janela principal
+local Window = WindUI:CreateWindow({
+Title = "Nexora Hub",
+Icon = "",
+Author = "Made For You",
+Folder = "NexoraHub",
+Theme = "Dark",
+SideBarWidth = 200,
+HideSearchBar = false,
+})
+
+-- Tag
+Window:Tag({
+Title = "Free Version",
+Color = Color3.fromHex("#30ff6a"),
+Radius = 100,
+})
+
+-- Cria a Section que vai comportar os Tabs principais
+local MainSection = Window:Section({
+Title = "Universal Scripts",
+Icon = "layers",
+Opened = true,
+})
+
+-- Dentro dessa Section, crias os Tabs (Universal e Game Scripts)
+local UniversalTab = MainSection:Tab({
+Title = "Fly",
+Icon = "settings",
+})
+
+
+local GameTab = MainSection:Tab({
+Title = "Game Scripts",
+Icon = "gamepad-2",
+})
+
+local Button = UniversalTab:Button({
+    Title = "Button",
+    Desc = "Test Button",
+    Locked = false,
+    Callback = function()
+        print("clicked")
+    end
+})
+
+-- Função auxiliar para adicionar um script num Tab
+local function AddScriptToTab(tab, name, url, icon)
+tab:Button({
+Title = name,
+Icon = icon or "code",
+Callback = function()
+tab:Window({
+Title = name,
+Icon = icon or "code",
+Content = "Clique Execute para rodar o script",
+Buttons = {
+{
+Title = "Execute",
+Callback = function()
+local success, err = pcall(function()
+loadstring(game:HttpGet(url, true))()
+end)
+if success then
+WindUI:Notify({
+Title = "Executed",
+Content = name .. " Executed!",
+Duration = 3,
+Icon = icon or "check",
+})
+else
+WindUI:Notify({
+Title = "Error",
+Content = "Falha: " .. name,
+Duration = 3,
+Icon = "x",
+})
+warn("Erro:", err)
+end
+end
+}
+}
+})
+end
+})
+end
