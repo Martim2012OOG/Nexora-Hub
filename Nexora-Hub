@@ -209,3 +209,4 @@ CreateGameButton(GameTab, "Natural Disaster Survival", "https://raw.githubuserco
 CreateGameButton(GameTab, "99 Nights In The Florest", "https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua")
 CreateGameButton(GameTab, "Steal a Brainrot", "https://raw.githubusercontent.com/bananaGanteng/Legend/refs/heads/main/Steal%20a%20Brainrot")
 CreateGameButton(GameTab, "Volleyball Legends", "https://raw.githubusercontent.com/Xm2iufas09ijmF/sigma-hub/refs/heads/main/temp.lua")
+CreateGameButton(GameTab, "99 Nights In The Florest[Day Farm]", "https://raw.githubusercontent.com/Rx1m/CpsHub/refs/heads/main/Day%20farm")
